@@ -1,4 +1,4 @@
-export interface Product {
+export interface IProduct {
   id: number;
   name: string;
   year: number;
@@ -6,16 +6,16 @@ export interface Product {
   pantone_value: string;
 }
 
-interface Support {
+interface ISupport {
   url: string;
   text: string;
 }
 
-export interface ApiResponse {
+export interface IApiResponse {
   page: number;
   per_page: number;
   total: number;
   total_pages: number;
-  data: Product[];
-  support: Support;
+  data: IProduct[];
+  support: ISupport;
 }

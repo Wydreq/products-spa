@@ -1,12 +1,12 @@
 import axios, { AxiosResponse } from 'axios';
-import { ApiResponse } from '../interfaces/IProducts';
+import { IApiResponse } from '../interfaces/IProducts';
 
 const API_BASE_URL = 'https://reqres.in/api/products/';
 
 export function fetchProducts(
   page: number | undefined,
   id: string | null
-): Promise<ApiResponse> {
+): Promise<IApiResponse> {
   let API_URL = API_BASE_URL;
 
   if (page !== null) {
@@ -19,7 +19,7 @@ export function fetchProducts(
 
   return axios
     .get(API_URL)
-    .then((res: AxiosResponse<ApiResponse>) => {
+    .then((res: AxiosResponse<IApiResponse>) => {
       return res.data;
     })
     .catch((err) => {
