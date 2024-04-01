@@ -17,6 +17,8 @@ export function fetchProducts(
     API_URL += `${page !== null ? '&' : '?'}id=${id}`;
   }
 
+  API_URL += `${page === null && id === null ? '?' : '&'}per_page=5`;
+
   return axios
     .get(API_URL)
     .then((res: AxiosResponse<IApiResponse>) => {
