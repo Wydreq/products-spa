@@ -9,6 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import { IProdColumn } from '../../interfaces/IProdColumns';
 import { IProduct } from '../../interfaces/IProducts';
 import './ProductsTable.css';
+import { ProductsTableRow } from './ProductsTableRow';
 
 const columns: IProdColumn[] = [
   { id: 'id', label: 'ID', align: 'right' },
@@ -42,26 +43,12 @@ export function ProductsTable(props: any) {
             {props.products &&
               props.products.map((row: IProduct) => {
                 return (
-                  <TableRow
-                    onClick={() => {
-                      rowClickHandler(row);
-                    }}
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
+                  <ProductsTableRow
                     key={row.id}
-                    style={{ backgroundColor: row.color }}
-                    className="tableRow"
-                  >
-                    {columns.map((column) => {
-                      const value = row[column.id as keyof IProduct];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          <p>{value}</p>
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
+                    rowClick={() => rowClickHandler(row)}
+                    columns={columns}
+                    row={row}
+                  />
                 );
               })}
           </TableBody>

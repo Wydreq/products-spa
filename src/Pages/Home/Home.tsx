@@ -5,20 +5,19 @@ import './Home.css';
 import { IProduct } from '../../interfaces/IProducts';
 import { ProductsTable } from '../../components/ProductsTable/ProductsTable';
 import { ProductModal } from '../../components/ProductModal/ProductModal';
-import { useNavigate } from 'react-router-dom';
 import { ErrorSnackbar } from '../../components/Snackbar/ErrorSnackbar';
 import { AxiosError } from 'axios';
 import { LoadingSpinner } from '../../components/LoadingSpinner/LoadingSpinner';
 import { getErrorMessageByCode } from '../../helpers/getErrorMessageByCode';
 import { loadingActions } from '../../store';
 import { useSelector, useDispatch } from 'react-redux';
+import { createSearchParams, useNavigate } from 'react-router-dom';
 
 export function Home() {
   const urlParams = new URLSearchParams(window.location.search);
   const pageParam = urlParams.get('page');
   const idParam = urlParams.get('id');
   const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [page, setPage] = useState<number | undefined>(initialPage);
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -28,37 +27,50 @@ export function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const loading = useSelector((state: any) => state.loading);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    params.set('page', page!.toString());
-    if (id.trim() !== '') {
-      params.set('id', id);
-    }
-    navigate(`?${params.toString()}`);
-  }, [page, id, navigate]);
+    window.addEventListener('popstate', () => {
+      fetchTableProducts();
+    });
+    return () =>
+      window.removeEventListener('popstate', () => {
+        fetchTableProducts();
+      });
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      dispatch(loadingActions.setLoadingTrue());
-      fetchProducts(page, id)
-        .then((res) => {
-          Array.isArray(res.data)
-            ? setProducts(res.data)
-            : setProducts([res.data]);
-          setTotalPages(res.total_pages ? res.total_pages : 1);
-          dispatch(loadingActions.setLoadingFalse());
-        })
-        .catch((err: AxiosError) => {
-          setErrorMessage(
-            getErrorMessageByCode(err.response!.status.toString())
-          );
-          setProducts([]);
-          dispatch(loadingActions.setLoadingFalse());
-        });
+      navigate({
+        pathname: '/',
+        search: createSearchParams({
+          page: `${page}`,
+          id: `${id}`,
+        }).toString(),
+      });
+      fetchTableProducts();
     }, 500);
     return () => clearTimeout(timer);
   }, [page, id]);
+
+  const fetchTableProducts = () => {
+    dispatch(loadingActions.setLoadingTrue());
+    fetchProducts(page, id)
+      .then((res) => {
+        console.log(res);
+        Array.isArray(res.data)
+          ? setProducts(res.data)
+          : setProducts([res.data]);
+        setTotalPages(res.total_pages ? res.total_pages : 1);
+        setPage(res.page);
+        dispatch(loadingActions.setLoadingFalse());
+      })
+      .catch((err: AxiosError) => {
+        setErrorMessage(getErrorMessageByCode(err.response!.status.toString()));
+        setProducts([]);
+        dispatch(loadingActions.setLoadingFalse());
+      });
+  };
 
   const handleIdChange = (event: any) => {
     const { value } = event.target;

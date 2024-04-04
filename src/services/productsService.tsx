@@ -7,7 +7,7 @@ export function fetchProducts(
   page: number | undefined,
   id: string | null
 ): Promise<IApiResponse> {
-  let API_URL = API_BASE_URL;
+  let API_URL = '';
 
   if (page !== null) {
     API_URL += `?page=${page}`;
@@ -19,8 +19,11 @@ export function fetchProducts(
 
   API_URL += `${page === null && id === null ? '?' : '&'}per_page=5`;
 
-  return axios
-    .get(API_URL)
+  return axios({
+    method: 'get',
+    url: API_URL,
+    baseURL: API_BASE_URL,
+  })
     .then((res: AxiosResponse<IApiResponse>) => {
       return res.data;
     })
