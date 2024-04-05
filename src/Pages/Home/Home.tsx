@@ -19,7 +19,7 @@ export function Home() {
   const idParam = urlParams.get('id');
   const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
   const dispatch = useDispatch();
-  const [page, setPage] = useState<number | undefined>(initialPage);
+  const [page, setPage] = useState<number>(initialPage ?? 1);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [currentProduct, setCurrentProduct] = useState<IProduct | null>(null);
   const [id, setId] = useState<string>(idParam ? idParam : '');
@@ -62,7 +62,7 @@ export function Home() {
           ? setProducts(res.data)
           : setProducts([res.data]);
         setTotalPages(res.total_pages ? res.total_pages : 1);
-        setPage(res.page);
+        res.page && setPage(res.page);
         dispatch(loadingActions.setLoadingFalse());
       })
       .catch((err: AxiosError) => {
